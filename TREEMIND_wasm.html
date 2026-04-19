@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TreeMind – Intelligent Data Structure Visualizer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --red:#FF2020;--orange:#FF6B00;--accent:#FF3D00;
+  --glow:rgba(255,61,0,0.55);--glow2:rgba(255,107,0,0.35);
+  --bg:#080808;--bg2:#0f0f0f;--bg3:#161616;--bg4:#1c1c1c;
+  --glass:rgba(255,255,255,0.04);--glass2:rgba(255,255,255,0.07);
+  --border:rgba(255,61,0,0.18);--border2:rgba(255,61,0,0.35);
+  --text:#F5F5F0;--muted:#888;--dim:#555;
+  --font-head:'Bebas Neue',sans-serif;
+  --font-body:'Rajdhani',sans-serif;
+  --font-mono:'Space Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:16px;overflow-x:hidden;line-height:1.6}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--accent);border-radius:2px}
+
+/* PARTICLES */
+#particles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.particle{position:absolute;border-radius:50%;animation:float linear infinite;opacity:0}
+@keyframes float{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:0.6}90%{opacity:0.2}100%{transform:translateY(-10vh) scale(1.5);opacity:0}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 3rem;background:rgba(8,8,8,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--font-head);font-size:2rem;letter-spacing:2px;background:linear-gradient(135deg,#FF2020,#FF8C00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;cursor:pointer}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-weight:600;font-size:0.9rem;letter-spacing:1px;text-transform:uppercase;transition:color 0.3s;cursor:pointer}
+.nav-links a:hover{color:var(--text)}
+.nav-btns{display:flex;gap:1rem;align-items:center}
+.btn-primary{background:linear-gradient(135deg,var(--red),var(--orange));color:#fff;border:none;padding:0.6rem 1.5rem;font-family:var(--font-body);font-weight:700;font-size:0.9rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:4px;box-shadow:0 0 20px var(--glow);transition:all 0.3s;position:relative;overflow:hidden}
+.btn-primary::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--orange),var(--red));opacity:0;transition:opacity 0.3s}
+.btn-primary:hover::before{opacity:1}
+.btn-primary:hover{box-shadow:0 0 40px var(--glow),0 0 80px rgba(255,61,0,0.2);transform:translateY(-1px)}
+.btn-secondary{background:transparent;color:var(--muted);border:1px solid var(--border2);padding:0.6rem 1.5rem;font-family:var(--font-body);font-weight:700;font-size:0.9rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all 0.3s}
+.btn-secondary:hover{border-color:var(--accent);color:var(--text);box-shadow:0 0 15px var(--glow2)}
+
+/* HERO */
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:7rem 3rem 3rem;position:relative;overflow:hidden;z-index:1}
+.hero::before{content:'';position:absolute;top:0;right:0;width:60%;height:100%;background:radial-gradient(ellipse at 80% 50%,rgba(255,61,0,0.08) 0%,transparent 70%);pointer-events:none}
+.hero-tag{display:inline-block;background:var(--glass2);border:1px solid var(--border2);color:var(--orange);font-size:0.75rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:0.4rem 1rem;border-radius:2px;margin-bottom:1.5rem}
+.hero-h1{font-family:var(--font-head);font-size:clamp(3rem,6vw,6rem);line-height:0.9;letter-spacing:2px;margin-bottom:1.5rem}
+.hero-h1 span{background:linear-gradient(135deg,#FF2020 0%,#FF8C00 50%,#FFB800 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{color:var(--muted);font-size:1.05rem;max-width:440px;margin-bottom:2.5rem;line-height:1.7}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap}
+.hero-stats{display:flex;gap:1rem;margin-top:3rem;flex-wrap:wrap}
+.stat-pill{background:var(--glass);border:1px solid var(--border);padding:0.8rem 1.2rem;border-radius:8px;backdrop-filter:blur(10px);font-size:0.8rem}
+.stat-pill strong{display:block;color:var(--orange);font-family:var(--font-head);font-size:1.4rem;letter-spacing:1px}
+.stat-pill span{color:var(--muted);font-size:0.75rem;letter-spacing:0.5px}
+.hero-right{display:flex;align-items:center;justify-content:center;position:relative}
+#hero-canvas{width:100%;max-width:520px;height:400px;border-radius:16px;position:relative}
+
+/* SECTION COMMON */
+section{padding:5rem 3rem;position:relative;z-index:1}
+.sec-label{color:var(--orange);font-size:0.75rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;margin-bottom:1rem}
+.sec-title{font-family:var(--font-head);font-size:clamp(2.5rem,4vw,4rem);line-height:0.95;letter-spacing:2px;margin-bottom:1.5rem}
+.sec-title span{background:linear-gradient(135deg,var(--red),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sec-desc{color:var(--muted);max-width:560px;font-size:1rem}
+
+/* STATS BAR */
+.stats-section{padding:3rem;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border)}
+.stat-card{background:var(--bg2);padding:2rem;text-align:center;transition:background 0.3s}
+.stat-card:hover{background:var(--bg3)}
+.stat-num{font-family:var(--font-head);font-size:3rem;letter-spacing:2px;background:linear-gradient(135deg,var(--red),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-label{color:var(--muted);font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;margin-top:0.3rem}
+
+/* FEATURES */
+.features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-top:3rem}
+.feature-card{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:2rem;transition:all 0.4s;cursor:pointer;position:relative;overflow:hidden}
+.feature-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,61,0,0.08),transparent);opacity:0;transition:opacity 0.4s}
+.feature-card:hover::before{opacity:1}
+.feature-card:hover{border-color:var(--border2);box-shadow:0 0 30px rgba(255,61,0,0.15),0 20px 40px rgba(0,0,0,0.4);transform:translateY(-4px)}
+.feat-icon{font-size:2.5rem;margin-bottom:1rem;display:block}
+.feat-title{font-family:var(--font-head);font-size:1.6rem;letter-spacing:1px;margin-bottom:0.5rem}
+.feat-desc{color:var(--muted);font-size:0.9rem;line-height:1.6;margin-bottom:1.2rem}
+.feat-btn{background:transparent;border:1px solid var(--border2);color:var(--orange);padding:0.5rem 1.2rem;font-family:var(--font-body);font-weight:700;font-size:0.8rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all 0.3s}
+.feat-btn:hover{background:linear-gradient(135deg,var(--red),var(--orange));color:#fff;border-color:transparent;box-shadow:0 0 20px var(--glow)}
+
+/* MODES */
+.modes-section{background:var(--bg2);border-top:1px solid var(--border)}
+.modes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem}
+.mode-card{border:1px solid var(--border);border-radius:12px;padding:2rem;position:relative;overflow:hidden;transition:all 0.4s;background:var(--bg3)}
+.mode-card.featured{border-color:var(--accent);box-shadow:0 0 30px rgba(255,61,0,0.2)}
+.mode-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:scan 3s linear infinite;opacity:0}
+.mode-card:hover::after,.mode-card.featured::after{opacity:1}
+@keyframes scan{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.mode-badge{position:absolute;top:1rem;right:1rem;background:linear-gradient(135deg,var(--red),var(--orange));color:#fff;font-size:0.65rem;font-weight:700;letter-spacing:1px;padding:0.25rem 0.6rem;border-radius:20px;text-transform:uppercase}
+.mode-icon{font-size:2rem;margin-bottom:1rem}
+.mode-title{font-family:var(--font-head);font-size:1.8rem;letter-spacing:1px;margin-bottom:0.5rem}
+.mode-price{font-family:var(--font-head);font-size:1.1rem;color:var(--orange);margin-bottom:1.2rem}
+.mode-features{list-style:none;margin-bottom:2rem}
+.mode-features li{color:var(--muted);font-size:0.9rem;padding:0.4rem 0;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;gap:0.5rem;align-items:center}
+.mode-features li::before{content:'▸';color:var(--orange);flex-shrink:0}
+.mode-select{width:100%;background:var(--glass2);border:1px solid var(--border2);color:var(--text);padding:0.8rem;font-family:var(--font-body);font-weight:700;font-size:0.9rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:6px;transition:all 0.3s}
+.mode-select:hover,.mode-select.active{background:linear-gradient(135deg,var(--red),var(--orange));border-color:transparent;box-shadow:0 0 20px var(--glow)}
+.mode-card.featured .mode-select{background:linear-gradient(135deg,var(--red),var(--orange));border-color:transparent}
+
+/* VISUALIZER */
+.viz-section{background:var(--bg);border-top:1px solid var(--border)}
+.viz-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
+.viz-layout{display:grid;grid-template-columns:1fr 320px;gap:1.5rem;align-items:start}
+.controls-bar{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:1.2rem;display:flex;flex-wrap:wrap;gap:1rem;align-items:center;margin-bottom:1.2rem}
+.ctrl-group{display:flex;flex-direction:column;gap:0.4rem}
+.ctrl-label{font-size:0.7rem;font-weight:700;letter-spacing:2px;color:var(--dim);text-transform:uppercase}
+select.ctrl-select{background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:0.5rem 0.8rem;font-family:var(--font-body);font-size:0.9rem;border-radius:6px;cursor:pointer;min-width:150px}
+input[type=number].ctrl-input{background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:0.5rem 0.8rem;font-family:var(--font-mono);font-size:0.9rem;border-radius:6px;width:80px}
+input[type=range].ctrl-range{accent-color:var(--orange);width:120px;cursor:pointer}
+.ctrl-btns{display:flex;gap:0.5rem;align-items:flex-end;flex-wrap:wrap}
+.op-btn{padding:0.55rem 1.2rem;font-family:var(--font-body);font-weight:700;font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:6px;transition:all 0.3s;border:none}
+.op-btn.insert{background:linear-gradient(135deg,var(--red),var(--orange));color:#fff;box-shadow:0 0 15px var(--glow)}
+.op-btn.insert:hover{box-shadow:0 0 30px var(--glow),0 0 60px rgba(255,61,0,0.2);transform:translateY(-1px)}
+.op-btn.delete{background:transparent;border:1px solid #FF2020;color:#FF2020}
+.op-btn.delete:hover{background:#FF2020;color:#fff;box-shadow:0 0 20px rgba(255,32,32,0.4)}
+.op-btn.search{background:transparent;border:1px solid #FFB800;color:#FFB800}
+.op-btn.search:hover{background:#FFB800;color:#111;box-shadow:0 0 20px rgba(255,184,0,0.4)}
+.op-btn.clear{background:transparent;border:1px solid var(--dim);color:var(--muted)}
+.op-btn.clear:hover{border-color:var(--muted);color:var(--text)}
+.op-btn.play{background:linear-gradient(135deg,#00C853,#00E676);color:#111;box-shadow:0 0 15px rgba(0,200,83,0.3)}
+#tree-canvas{width:100%;height:480px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;position:relative;overflow:hidden}
+#tree-canvas canvas,#tree-canvas svg{width:100%;height:100%}
+.canvas-label{position:absolute;top:1rem;left:1rem;font-size:0.7rem;color:var(--dim);font-family:var(--font-mono);letter-spacing:2px}
+.canvas-type{position:absolute;top:1rem;right:1rem;font-size:0.7rem;color:var(--orange);font-family:var(--font-mono);letter-spacing:2px;font-weight:700}
+
+/* STEP LOGGER */
+.step-panel{background:var(--bg2);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;height:100%;max-height:600px}
+.step-header{padding:1rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.step-title{font-family:var(--font-head);font-size:1.2rem;letter-spacing:1px;color:var(--orange)}
+.step-count{font-family:var(--font-mono);font-size:0.75rem;color:var(--dim)}
+.step-log{flex:1;overflow-y:auto;padding:1rem}
+.step-item{padding:0.7rem;border-radius:6px;margin-bottom:0.5rem;border:1px solid transparent;transition:all 0.3s;animation:slideIn 0.3s ease}
+.step-item.active{background:rgba(255,61,0,0.1);border-color:var(--border2);box-shadow:0 0 10px rgba(255,61,0,0.1)}
+.step-item.done{background:var(--glass);opacity:0.6}
+@keyframes slideIn{from{transform:translateX(-10px);opacity:0}to{transform:none;opacity:1}}
+.step-num{font-family:var(--font-mono);font-size:0.7rem;color:var(--orange);margin-bottom:0.2rem}
+.step-action{font-weight:600;font-size:0.9rem;margin-bottom:0.2rem;color:var(--text)}
+.step-reason{font-size:0.8rem;color:var(--muted);line-height:1.5}
+.step-empty{text-align:center;padding:3rem 1rem;color:var(--dim);font-size:0.85rem}
+.step-empty-icon{font-size:2rem;margin-bottom:0.5rem}
+.step-footer{padding:0.8rem 1.2rem;border-top:1px solid var(--border)}
+.step-progress{height:2px;background:var(--bg3);border-radius:1px;overflow:hidden}
+.step-progress-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--orange));border-radius:1px;transition:width 0.4s}
+
+/* ALGO INFO */
+.algo-info{background:var(--glass);border:1px solid var(--border);border-radius:8px;padding:0.8rem 1rem;margin-bottom:0.8rem;font-size:0.8rem;color:var(--muted);line-height:1.6}
+.algo-info strong{color:var(--orange)}
+
+/* NODE TOOLTIP */
+.node-tooltip{position:absolute;background:rgba(8,8,8,0.95);border:1px solid var(--border2);border-radius:8px;padding:0.6rem 0.8rem;font-size:0.78rem;font-family:var(--font-mono);color:var(--text);pointer-events:none;opacity:0;transition:opacity 0.2s;z-index:10;white-space:nowrap;box-shadow:0 0 20px rgba(255,61,0,0.2)}
+
+/* LOADING */
+#loader{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.6s}
+#loader.hide{opacity:0;pointer-events:none}
+.loader-tree{animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{filter:drop-shadow(0 0 10px var(--orange))}50%{filter:drop-shadow(0 0 30px var(--red)) drop-shadow(0 0 60px var(--orange))}}
+.loader-text{font-family:var(--font-head);font-size:2rem;letter-spacing:4px;margin-top:1.5rem;background:linear-gradient(135deg,var(--red),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.loader-sub{font-family:var(--font-mono);font-size:0.75rem;color:var(--dim);letter-spacing:3px;margin-top:0.5rem;text-transform:uppercase}
+.loader-bar{width:200px;height:2px;background:var(--bg3);border-radius:1px;margin-top:1.5rem;overflow:hidden}
+.loader-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--orange));border-radius:1px;animation:load 1.8s ease forwards}
+@keyframes load{from{width:0}to{width:100%}}
+
+/* WASM status badge */
+#wasm-badge{position:fixed;bottom:1rem;right:1rem;font-family:var(--font-mono);font-size:0.65rem;letter-spacing:2px;padding:0.35rem 0.75rem;border-radius:4px;z-index:200;border:1px solid;opacity:0.85}
+#wasm-badge.wasm{background:rgba(0,200,83,0.12);border-color:rgba(0,200,83,0.4);color:#00E676}
+#wasm-badge.js{background:rgba(255,184,0,0.12);border-color:rgba(255,184,0,0.4);color:#FFB800}
+
+/* FOOTER */
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 3rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.footer-logo{font-family:var(--font-head);font-size:1.5rem;letter-spacing:2px;background:linear-gradient(135deg,var(--red),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.footer-text{color:var(--dim);font-size:0.8rem;letter-spacing:1px}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  nav{padding:1rem 1.5rem}
+  .nav-links{display:none}
+  .hero{grid-template-columns:1fr;padding:6rem 1.5rem 3rem}
+  .hero-right{display:none}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .features-grid{grid-template-columns:1fr}
+  .modes-grid{grid-template-columns:1fr}
+  section{padding:3rem 1.5rem}
+  .viz-layout{grid-template-columns:1fr}
+  .step-panel{max-height:300px}
+  footer{flex-direction:column;gap:1rem;text-align:center;padding:1.5rem}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <svg class="loader-tree" width="100" height="100" viewBox="0 0 100 100">
+    <circle cx="50" cy="15" r="12" fill="none" stroke="#FF2020" stroke-width="2.5"/>
+    <circle cx="25" cy="50" r="12" fill="none" stroke="#FF6B00" stroke-width="2.5"/>
+    <circle cx="75" cy="50" r="12" fill="none" stroke="#FF6B00" stroke-width="2.5"/>
+    <circle cx="12" cy="83" r="10" fill="none" stroke="#FFB800" stroke-width="2"/>
+    <circle cx="38" cy="83" r="10" fill="none" stroke="#FFB800" stroke-width="2"/>
+    <circle cx="62" cy="83" r="10" fill="none" stroke="#FFB800" stroke-width="2"/>
+    <circle cx="88" cy="83" r="10" fill="none" stroke="#FFB800" stroke-width="2"/>
+    <line x1="50" y1="27" x2="30" y2="38" stroke="#FF4400" stroke-width="1.5"/>
+    <line x1="50" y1="27" x2="70" y2="38" stroke="#FF4400" stroke-width="1.5"/>
+    <line x1="25" y1="62" x2="15" y2="73" stroke="#FF8800" stroke-width="1.5"/>
+    <line x1="25" y1="62" x2="38" y2="73" stroke="#FF8800" stroke-width="1.5"/>
+    <line x1="75" y1="62" x2="62" y2="73" stroke="#FF8800" stroke-width="1.5"/>
+    <line x1="75" y1="62" x2="88" y2="73" stroke="#FF8800" stroke-width="1.5"/>
+  </svg>
+  <div class="loader-text">TREEMIND</div>
+  <div class="loader-sub">Initializing Visualizer</div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+</div>
+
+<!-- WASM STATUS BADGE -->
+<div id="wasm-badge" class="js">⬡ JS MODE</div>
+
+<!-- PARTICLES -->
+<div id="particles"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo" onclick="scrollTo(0,0)">TREEMIND</div>
+  <ul class="nav-links">
+    <li><a onclick="scrollTo(0,0)">Home</a></li>
+    <li><a onclick="document.getElementById('visualizer').scrollIntoView({behavior:'smooth'})">Visualizer</a></li>
+    <li><a onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Learn</a></li>
+    <li><a onclick="document.getElementById('modes').scrollIntoView({behavior:'smooth'})">Modes</a></li>
+    <li><a onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">About</a></li>
+  </ul>
+  <div class="nav-btns">
+    <button class="btn-primary" onclick="document.getElementById('visualizer').scrollIntoView({behavior:'smooth'})">Try Now</button>
+    <button class="btn-secondary">GitHub</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-left">
+    <div class="hero-tag">🌳 Visual Learning Platform</div>
+    <h1 class="hero-h1">Master<br><span>Data Structures</span><br>Visually</h1>
+    <p class="hero-sub">Understand Binary Trees, Red-Black Trees, and B+ Trees step-by-step with interactive animations and real-time explanations.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="document.getElementById('visualizer').scrollIntoView({behavior:'smooth'})">▶ Start Visualizing</button>
+      <button class="btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Explore Concepts</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-pill"><strong>1000+</strong><span>Operations Visualized</span></div>
+      <div class="stat-pill"><strong>3</strong><span>Tree Types</span></div>
+      <div class="stat-pill"><strong>Real-time</strong><span>Step Explanations</span></div>
+      <div class="stat-pill"><strong>∞</strong><span>Interactive Learning</span></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <canvas id="hero-canvas" width="520" height="400"></canvas>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-section">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-num">95%</div><div class="stat-label">Concept Clarity</div></div>
+    <div class="stat-card"><div class="stat-num">O(log n)</div><div class="stat-label">Optimization Learning</div></div>
+    <div class="stat-card"><div class="stat-num">500+</div><div class="stat-label">Students Benefited</div></div>
+    <div class="stat-card"><div class="stat-num">Live</div><div class="stat-label">Algorithm Simulation</div></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="sec-label">Core Modules</div>
+  <h2 class="sec-title">Powerful <span>Learning Tools</span></h2>
+  <p class="sec-desc">Each visualizer is engineered to show not just WHAT happens — but WHY it happens at every step.</p>
+  <div class="features-grid">
+    <div class="feature-card" onclick="setTreeType('bst')">
+      <span class="feat-icon">🌳</span>
+      <div class="feat-title">Binary Search Tree</div>
+      <p class="feat-desc">Watch BST insertion, deletion, and traversal algorithms unfold in real-time. Understand rotations, balancing, and height optimization with annotated visuals.</p>
+      <button class="feat-btn" onclick="setTreeType('bst');document.getElementById('visualizer').scrollIntoView({behavior:'smooth'})">Try Now →</button>
+    </div>
+    <div class="feature-card" onclick="setTreeType('rbt')">
+      <span class="feat-icon">🔴</span>
+      <div class="feat-title">Red-Black Tree Simulator</div>
+      <p class="feat-desc">See color-flips and rotations animate live. Understand every rebalancing rule: uncle red? Rotate. Uncle black? Double rotate. Explained step-by-step.</p>
+      <button class="feat-btn" onclick="setTreeType('rbt');document.getElementById('visualizer').scrollIntoView({behavior:'smooth'})">Try Now →</button>
+    </div>
+    <div class="feature-card" onclick="setTreeType('bplus')">
+      <span class="feat-icon">🌲</span>
+      <div class="feat-title">B+ Tree Builder</div>
+      <p class="feat-desc">Construct multi-level B+ trees and watch page splits cascade. Visualize how databases index your data with minimum reads guaranteed.</p>
+      <button class="feat-btn" onclick="setTreeType('bplus');document.getElementById('visualizer').scrollIntoView({behavior:'smooth'})">Try Now →</button>
+    </div>
+    <div class="feature-card" onclick="setTreeType('btree')">
+      <span class="feat-icon">🧱</span>
+      <div class="feat-title">B-Tree Explorer</div>
+      <p class="feat-desc">Visualize classic multi-way B-Tree insertion with node splitting and key promotion. Great for index structures and storage systems.</p>
+      <button class="feat-btn" onclick="setTreeType('btree');document.getElementById('visualizer').scrollIntoView({behavior:'smooth'})">Try Now →</button>
+    </div>
+    <div class="feature-card" onclick="setTreeType('splay')">
+      <span class="feat-icon">🌀</span>
+      <div class="feat-title">Splay Tree Lab</div>
+      <p class="feat-desc">Watch zig, zig-zig, and zig-zag rotations reorganize the tree after each access so frequently used values move closer to the root.</p>
+      <button class="feat-btn" onclick="setTreeType('splay');document.getElementById('visualizer').scrollIntoView({behavior:'smooth'})">Try Now →</button>
+    </div>
+    <div class="feature-card">
+      <span class="feat-icon">⚡</span>
+      <div class="feat-title">Step Explanation Engine</div>
+      <p class="feat-desc">Every operation generates a human-readable explanation log. Follow the algorithm's decision-making process with highlighted nodes and edge annotations.</p>
+      <button class="feat-btn" onclick="document.getElementById('visualizer').scrollIntoView({behavior:'smooth'})">Explore →</button>
+    </div>
+  </div>
+</section>
+
+<!-- MODES -->
+<section class="modes-section" id="modes">
+  <div class="sec-label">Learning Paths</div>
+  <h2 class="sec-title">Choose Your <span>Mode</span></h2>
+  <p class="sec-desc">Start at your level and progress through increasingly complex interactions.</p>
+  <div class="modes-grid">
+    <div class="mode-card">
+      <div class="mode-icon">🌱</div>
+      <div class="mode-title">Beginner Mode</div>
+      <div class="mode-price">Step-by-Step Guided</div>
+      <ul class="mode-features">
+        <li>Pre-built tree examples</li>
+        <li>Narrated insertions</li>
+        <li>Concept tooltips on hover</li>
+        <li>Visual traversal animations</li>
+        <li>Slow-motion operations</li>
+      </ul>
+      <button class="mode-select" onclick="setMode('beginner',this)">Select Mode</button>
+    </div>
+    <div class="mode-card featured">
+      <div class="mode-badge">Most Popular</div>
+      <div class="mode-icon">🔥</div>
+      <div class="mode-title">Interactive Mode</div>
+      <div class="mode-price">Full Control</div>
+      <ul class="mode-features">
+        <li>Insert / Delete / Search live</li>
+        <li>Speed control slider</li>
+        <li>Real-time step log</li>
+        <li>All 3 tree types</li>
+        <li>Zoom & pan canvas</li>
+        <li>Export visualization</li>
+      </ul>
+      <button class="mode-select active" onclick="setMode('interactive',this)">Active Mode</button>
+    </div>
+    <div class="mode-card">
+      <div class="mode-icon">🧠</div>
+      <div class="mode-title">Algorithm Mode</div>
+      <div class="mode-price">Complexity Analysis</div>
+      <ul class="mode-features">
+        <li>Big-O complexity overlay</li>
+        <li>Worst-case scenario builder</li>
+        <li>Comparison mode (2 trees)</li>
+        <li>Performance benchmarks</li>
+        <li>Export step report</li>
+      </ul>
+      <button class="mode-select" onclick="setMode('algorithm',this)">Select Mode</button>
+    </div>
+  </div>
+</section>
+
+<!-- VISUALIZER -->
+<section class="viz-section" id="visualizer">
+  <div class="viz-header">
+    <div>
+      <div class="sec-label">Interactive Engine</div>
+      <h2 class="sec-title">Tree <span>Visualizer</span></h2>
+    </div>
+    <div style="font-family:var(--font-mono);font-size:0.75rem;color:var(--dim)">
+      COMPLEXITY: <span id="complexity-label" style="color:var(--orange)">O(log n)</span>
+    </div>
+  </div>
+
+  <div class="controls-bar">
+    <div class="ctrl-group">
+      <span class="ctrl-label">Tree Type</span>
+      <select class="ctrl-select" id="tree-type-select" onchange="onTreeTypeChange(this.value)">
+        <option value="bst">Binary Search Tree</option>
+        <option value="rbt">Red-Black Tree</option>
+        <option value="bplus">B+ Tree</option>
+        <option value="btree">B-Tree</option>
+        <option value="splay">Splay Tree</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Value</span>
+      <input type="number" class="ctrl-input" id="val-input" placeholder="42" min="1" max="999"/>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Speed</span>
+      <input type="range" class="ctrl-range" id="speed-slider" min="1" max="5" value="3"/>
+    </div>
+    <div class="ctrl-btns">
+      <button class="op-btn insert" onclick="doInsert()">⊕ Insert</button>
+      <button class="op-btn delete" onclick="doDelete()">⊖ Delete</button>
+      <button class="op-btn search" onclick="doSearch()">⌕ Search</button>
+      <button class="op-btn clear" onclick="doClear()">✕ Clear</button>
+      <button class="op-btn play" id="play-btn" onclick="togglePlay()">▶ Auto</button>
+    </div>
+  </div>
+
+  <div class="viz-layout">
+    <div class="viz-main">
+      <div class="algo-info" id="algo-info">
+        <strong>Binary Search Tree</strong> — Every left child &lt; parent &lt; right child. Insert: O(log n) avg, O(n) worst. Delete: replace with in-order successor. Search: traverse left or right based on comparison.
+      </div>
+      <div id="tree-canvas">
+        <div class="canvas-label" id="canvas-label">BST VISUALIZER</div>
+        <div class="canvas-type" id="canvas-type">BINARY SEARCH TREE</div>
+        <svg id="tree-svg" width="100%" height="100%"></svg>
+        <div class="node-tooltip" id="tooltip"></div>
+      </div>
+    </div>
+    <div class="step-panel">
+      <div class="step-header">
+        <span class="step-title">▷ Operation Log</span>
+        <span class="step-count" id="step-count">0 steps</span>
+      </div>
+      <div class="step-log" id="step-log">
+        <div class="step-empty">
+          <div class="step-empty-icon">🌳</div>
+          <div>Insert nodes to see<br>step-by-step explanations</div>
+        </div>
+      </div>
+      <div class="step-footer">
+        <div class="step-progress"><div class="step-progress-fill" id="progress-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" style="text-align:center;background:var(--bg2);border-top:1px solid var(--border)">
+  <div class="sec-label" style="justify-content:center;display:flex">Built For Learners</div>
+  <h2 class="sec-title" style="justify-content:center">Why <span>TreeMind?</span></h2>
+  <p class="sec-desc" style="margin:0 auto 2rem;text-align:center">Most algorithm textbooks show you a finished tree. TreeMind shows you the <em>journey</em>. Every rotation, every color-flip, every page split — explained the moment it happens.</p>
+  <div style="display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;margin-top:2rem">
+    <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:1.5rem 2rem;max-width:200px;text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:0.5rem">🎯</div>
+      <div style="font-family:var(--font-head);font-size:1.2rem;letter-spacing:1px;margin-bottom:0.3rem">Precision</div>
+      <div style="color:var(--muted);font-size:0.82rem">Every operation explained with algorithmic precision</div>
+    </div>
+    <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:1.5rem 2rem;max-width:200px;text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:0.5rem">⚡</div>
+      <div style="font-family:var(--font-head);font-size:1.2rem;letter-spacing:1px;margin-bottom:0.3rem">Speed</div>
+      <div style="color:var(--muted);font-size:0.82rem">Real-time rendering at 60fps with zero lag</div>
+    </div>
+    <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:1.5rem 2rem;max-width:200px;text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:0.5rem">🔬</div>
+      <div style="font-family:var(--font-head);font-size:1.2rem;letter-spacing:1px;margin-bottom:0.3rem">Depth</div>
+      <div style="color:var(--muted);font-size:0.82rem">From O(1) to O(n) — every complexity understood</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">TREEMIND</div>
+  <div class="footer-text">© 2025 TreeMind — Intelligent Data Structure Visualizer</div>
+  <div class="footer-text">Built with passion for learning · C/WASM Edition</div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════
+     SCRIPT SECTION
+     ═══════════════════════════════════════════════════════
+     Architecture:
+       1. TreeMindWASM  — thin wrapper around Emscripten module
+                          (loads treemind.js + treemind.wasm)
+       2. TreeMindJS    — pure-JS fallback (identical to original)
+       3. TreeMindBridge— selects WASM or JS transparently
+       4. UI layer      — identical to original (renderTree, updateSteps…)
+  ═══════════════════════════════════════════════════════ -->
+<script>
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION 1 — PARTICLES & HERO CANVAS  (unchanged from original)
+   ═══════════════════════════════════════════════════════════ */
+(function(){
+  const c=document.getElementById('particles');
+  const colors=['#FF2020','#FF6B00','#FF8C00','#FFB800','#FF4400'];
+  for(let i=0;i<30;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    const sz=Math.random()*4+2;
+    p.style.cssText=`width:${sz}px;height:${sz}px;background:${colors[Math.floor(Math.random()*colors.length)]};left:${Math.random()*100}%;animation-duration:${Math.random()*15+8}s;animation-delay:${Math.random()*10}s;`;
+    c.appendChild(p);
+  }
+})();
+
+(function(){
+  const canvas=document.getElementById('hero-canvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=520;canvas.height=400;
+  const nodes=[
+    {x:260,y:60,val:50,r:24,glow:'#FF2020'},
+    {x:150,y:145,val:30,r:20,glow:'#FF6B00'},
+    {x:370,y:145,val:70,r:20,glow:'#FF6B00'},
+    {x:90,y:225,val:20,r:17,glow:'#FFB800'},
+    {x:210,y:225,val:40,r:17,glow:'#FFB800'},
+    {x:310,y:225,val:60,r:17,glow:'#FFB800'},
+    {x:430,y:225,val:80,r:17,glow:'#FFB800'},
+    {x:60,y:295,val:15,r:14,glow:'#FF4400'},
+    {x:120,y:295,val:25,r:14,glow:'#FF4400'},
+    {x:180,y:295,val:35,r:14,glow:'#FF4400'},
+    {x:240,y:295,val:45,r:14,glow:'#FF4400'},
+  ];
+  const edges=[[0,1],[0,2],[1,3],[1,4],[2,5],[2,6],[3,7],[3,8],[4,9],[4,10]];
+  let t=0,hov=-1;
+  function draw(){
+    ctx.clearRect(0,0,520,400);
+    edges.forEach(([a,b])=>{
+      const n1=nodes[a],n2=nodes[b];
+      ctx.beginPath();ctx.moveTo(n1.x,n1.y);
+      const cp1x=(n1.x+n2.x)/2,cp1y=n1.y+30;
+      ctx.quadraticCurveTo(cp1x,cp1y,n2.x,n2.y);
+      ctx.strokeStyle=`rgba(255,68,0,${0.25+0.1*Math.sin(t*0.04+a)})`;
+      ctx.lineWidth=1.5;ctx.stroke();
+    });
+    nodes.forEach((n,i)=>{
+      const bop=Math.sin(t*0.03+i*0.8)*4;
+      const gr=ctx.createRadialGradient(n.x,n.y+bop,0,n.x,n.y+bop,n.r*1.8);
+      gr.addColorStop(0,n.glow+'88');gr.addColorStop(1,'transparent');
+      ctx.beginPath();ctx.arc(n.x,n.y+bop,n.r*1.8,0,Math.PI*2);
+      ctx.fillStyle=gr;ctx.fill();
+      ctx.beginPath();ctx.arc(n.x,n.y+bop,n.r,0,Math.PI*2);
+      ctx.fillStyle='#111';ctx.strokeStyle=n.glow;
+      ctx.lineWidth=i===hov?3:1.5;ctx.fill();ctx.stroke();
+      ctx.fillStyle=i===hov?'#FFF':'#EEE';
+      ctx.font=`${n.r>17?'700 13px':'600 11px'} 'Space Mono',monospace`;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(n.val,n.x,n.y+bop);
+    });
+    t++;requestAnimationFrame(draw);
+  }
+  draw();
+  canvas.addEventListener('mousemove',e=>{
+    const rect=canvas.getBoundingClientRect();
+    const sx=e.clientX-rect.left,sy=e.clientY-rect.top;
+    hov=-1;
+    nodes.forEach((n,i)=>{const dx=n.x-sx*520/rect.width,dy=n.y-sy*400/rect.height;if(Math.sqrt(dx*dx+dy*dy)<n.r+5)hov=i;});
+  });
+  canvas.addEventListener('mouseleave',()=>hov=-1);
+})();
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION 2 — PURE-JS FALLBACK ENGINE
+   (Identical to original JS classes — used when WASM not available)
+   ═══════════════════════════════════════════════════════════ */
+class BST_JS {
+  constructor(){this.root=null;this.steps=[];}
+  insert(val){
+    this.steps=[];
+    const node={val,left:null,right:null,color:'node',id:Date.now()+''+val};
+    if(!this.root){this.root=node;this.steps.push({action:`Insert ${val}`,reason:`Tree is empty — ${val} becomes the root node.`});return;}
+    let cur=this.root,par=null,dir='';
+    while(cur){
+      this.steps.push({action:`Compare ${val} vs ${cur.val}`,reason:`${val} ${val<cur.val?'<':val>cur.val?'>':'='} ${cur.val} → go ${val<cur.val?'LEFT':'RIGHT'}`});
+      par=cur;
+      if(val<cur.val){dir='left';cur=cur.left;}
+      else if(val>cur.val){dir='right';cur=cur.right;}
+      else{this.steps.push({action:`Duplicate ${val}`,reason:'Value already exists — BST does not allow duplicates.'});return;}
+    }
+    par[dir]=node;
+    this.steps.push({action:`Place ${val} as ${dir} child of ${par.val}`,reason:`${val} ${dir==='left'?'<':'>='} ${par.val} so it goes ${dir.toUpperCase()}.`});
+  }
+  search(val){
+    this.steps=[];let cur=this.root,depth=0;
+    while(cur){
+      this.steps.push({action:`Visit node ${cur.val}`,reason:`Depth ${depth}: compare ${val} vs ${cur.val}`});
+      if(val===cur.val){this.steps.push({action:`Found ${val}!`,reason:`Search complete in ${depth+1} comparisons.`});return cur;}
+      if(val<cur.val){this.steps.push({action:`Go LEFT from ${cur.val}`,reason:`${val} < ${cur.val}`});cur=cur.left;}
+      else{this.steps.push({action:`Go RIGHT from ${cur.val}`,reason:`${val} > ${cur.val}`});cur=cur.right;}
+      depth++;
+    }
+    this.steps.push({action:`${val} NOT FOUND`,reason:`Reached null — value does not exist in tree.`});
+  }
+  delete(val){
+    this.steps=[];this.steps.push({action:`Delete ${val}`,reason:'Finding node to delete...'});
+    this.root=this._del(this.root,val);
+  }
+  _del(node,val){
+    if(!node){this.steps.push({action:'Node not found',reason:'Value does not exist in tree'});return null;}
+    if(val<node.val){this.steps.push({action:`Go LEFT from ${node.val}`,reason:`${val} < ${node.val}`});node.left=this._del(node.left,val);}
+    else if(val>node.val){this.steps.push({action:`Go RIGHT from ${node.val}`,reason:`${val} > ${node.val}`});node.right=this._del(node.right,val);}
+    else{
+      if(!node.left&&!node.right){this.steps.push({action:`Remove leaf ${val}`,reason:'Leaf node — simply remove.'});return null;}
+      if(!node.left){this.steps.push({action:`Replace ${val} with right child`,reason:'Only right child exists.'});return node.right;}
+      if(!node.right){this.steps.push({action:`Replace ${val} with left child`,reason:'Only left child exists.'});return node.left;}
+      let succ=node.right;while(succ.left)succ=succ.left;
+      this.steps.push({action:`Replace ${val} with in-order successor ${succ.val}`,reason:'Node has two children — use smallest value from right subtree.'});
+      node.val=succ.val;node.right=this._del(node.right,succ.val);
+    }
+    return node;
+  }
+  toArray(){const arr=[];const dfs=(n,x,y,xOff)=>{if(!n)return;arr.push({id:n.id,val:n.val,x,y,color:n.color||'node'});if(n.left)arr.push({type:'edge',x1:x,y1:y,x2:x-xOff,y2:y+80});if(n.right)arr.push({type:'edge',x1:x,y1:y,x2:x+xOff,y2:y+80});dfs(n.left,x-xOff,y+80,xOff/1.7);dfs(n.right,x+xOff,y+80,xOff/1.7);};dfs(this.root,0,40,110);return arr;}
+}
+
+class RBT_JS extends BST_JS {
+  constructor(){super();this.RED='RED';this.BLACK='BLACK';}
+  _newNode(val){return{val,left:null,right:null,color:this.RED,id:Date.now()+''+val};}
+  insert(val){
+    this.steps=[];
+    this.steps.push({action:`RBT Insert ${val}`,reason:'Red-Black Tree insertion — insert as RED, then fix violations.'});
+    this.root=this._ins(this.root,val);
+    this.root.color=this.BLACK;
+    this.steps.push({action:'Recolor root BLACK',reason:'Rule: Root is always BLACK.'});
+  }
+  _ins(node,val){
+    if(!node){this.steps.push({action:`Create RED node ${val}`,reason:'New nodes start as RED to minimize BLACK-height changes.'});return this._newNode(val);}
+    if(val<node.val){this.steps.push({action:`Go LEFT at ${node.val}`,reason:`${val} < ${node.val}`});node.left=this._ins(node.left,val);}
+    else if(val>node.val){this.steps.push({action:`Go RIGHT at ${node.val}`,reason:`${val} > ${node.val}`});node.right=this._ins(node.right,val);}
+    if(this._isRed(node.right)&&!this._isRed(node.left)){this.steps.push({action:`Left rotate at ${node.val}`,reason:'Right RED child, left not RED → rotate left.'});node=this._rotL(node);}
+    if(this._isRed(node.left)&&this._isRed(node.left?.left)){this.steps.push({action:`Right rotate at ${node.val}`,reason:'Two consecutive LEFT REDs → rotate right.'});node=this._rotR(node);}
+    if(this._isRed(node.left)&&this._isRed(node.right)){this.steps.push({action:`Color flip at ${node.val}`,reason:'Both children RED → flip colors to propagate BLACK-height.'});this._flip(node);}
+    return node;
+  }
+  _isRed(n){return n&&n.color===this.RED}
+  _rotL(h){const x=h.right;h.right=x.left;x.left=h;x.color=h.color;h.color=this.RED;return x;}
+  _rotR(h){const x=h.left;h.left=x.right;x.right=h;x.color=h.color;h.color=this.RED;return x;}
+  _flip(h){h.color=h.color===this.RED?this.BLACK:this.RED;h.left.color=h.left.color===this.RED?this.BLACK:this.RED;h.right.color=h.right.color===this.RED?this.BLACK:this.RED;}
+  toArray(){const arr=[];const dfs=(n,x,y,xOff)=>{if(!n)return;arr.push({id:n.id,val:n.val,x,y,color:n.color==='RED'?'red':'black'});if(n.left)arr.push({type:'edge',x1:x,y1:y,x2:x-xOff,y2:y+80});if(n.right)arr.push({type:'edge',x1:x,y1:y,x2:x+xOff,y2:y+80});dfs(n.left,x-xOff,y+80,xOff/1.7);dfs(n.right,x+xOff,y+80,xOff/1.7);};dfs(this.root,0,40,120);return arr;}
+}
+
+class BPlusTree_JS {
+  constructor(order=3){this.order=order;this.root=null;this.steps=[];this.leaves=[];}
+  insert(val){
+    this.steps=[];
+    this.steps.push({action:`B+ Insert ${val}`,reason:`Order ${this.order} B+ Tree — max ${this.order-1} keys per node.`});
+    if(!this.root){this.root={keys:[val],children:[],isLeaf:true,id:'r'+Date.now()};this.leaves=[this.root];this.steps.push({action:`Create root leaf [${val}]`,reason:'First insertion — root is a leaf node.'});return;}
+    this._insertLeaf(val);
+  }
+  _insertLeaf(val){
+    let leaf=this.root;
+    while(!leaf.isLeaf){let i=0;while(i<leaf.keys.length&&val>leaf.keys[i])i++;leaf=leaf.children[i]||leaf.children[leaf.children.length-1];}
+    const pos=leaf.keys.findIndex(k=>k>val);
+    if(pos===-1)leaf.keys.push(val);else leaf.keys.splice(pos,0,val);
+    this.steps.push({action:`Insert ${val} into leaf [${leaf.keys.join(',')}]`,reason:'Placed in sorted position in leaf node.'});
+    if(leaf.keys.length>=this.order){
+      this.steps.push({action:`Split leaf — too many keys (${leaf.keys.length})`,reason:`Max keys = ${this.order-1}. Split into two leaves.`});
+      const mid=Math.ceil(leaf.keys.length/2);
+      const newLeaf={keys:leaf.keys.splice(mid),children:[],isLeaf:true,id:'l'+Date.now()};
+      this.steps.push({action:`Promote key ${newLeaf.keys[0]} to parent`,reason:'B+ Tree: copy-up strategy — keep key in leaf too.'});
+      if(this.root===leaf){this.root={keys:[newLeaf.keys[0]],children:[leaf,newLeaf],isLeaf:false,id:'i'+Date.now()};}
+    }
+  }
+  search(val){
+    this.steps=[];
+    this.steps.push({action:`B+ Search ${val}`,reason:'Traverse from root to leaf following key comparisons.'});
+    let node=this.root;
+    while(node&&!node.isLeaf){let i=0;while(i<node.keys.length&&val>=node.keys[i])i++;this.steps.push({action:`At internal node [${node.keys.join(',')}]`,reason:`${val} → go to child[${i}]`});node=node.children[i];}
+    if(node){if(node.keys.includes(val))this.steps.push({action:`Found ${val} in leaf!`,reason:'B+ Trees store all data in leaves.'});else this.steps.push({action:`${val} NOT FOUND`,reason:'Value not present in any leaf node.'});}
+  }
+  delete(val){this.steps=[];this.steps.push({action:`Delete ${val}`,reason:'B+ delete: find leaf, remove key.'});}
+  toArray(){
+    const arr=[];const levels=[];
+    const bfs=(n,level,x)=>{if(!n)return;if(!levels[level])levels[level]=[];levels[level].push({node:n,x});};
+    bfs(this.root,0,0);
+    let y=40;
+    levels.forEach((level,li)=>{
+      const spacing=Math.max(120,500/level.length);
+      level.forEach((item,i)=>{
+        const x=(i-(level.length-1)/2)*spacing;
+        const n=item.node;
+        arr.push({id:n.id,val:n.keys.join('|'),x,y,color:n.isLeaf?'leaf':'internal',multi:true});
+        if(!n.isLeaf){n.children.forEach((c,ci)=>{const cx=(ci-(n.children.length)/2+0.5)*spacing+x;arr.push({type:'edge',x1:x,y1:y,x2:cx,y2:y+90});bfs(c,li+1,cx);});}
+      });
+      y+=90;
+    });
+    return arr;
+  }
+}
+
+class BTree_JS {
+  constructor(order=3){this.order=order;this.root=null;this.steps=[];}
+  _newNode(isLeaf){return{keys:[],children:[],isLeaf,id:'bt'+Date.now()+Math.random().toString(16).slice(2)};}
+  _splitChild(parent,i){
+    const c=parent.children[i],mid=Math.floor(c.keys.length/2),promote=c.keys[mid];
+    const r=this._newNode(c.isLeaf);
+    r.keys=c.keys.slice(mid+1);
+    c.keys=c.keys.slice(0,mid);
+    if(!c.isLeaf){r.children=c.children.slice(mid+1);c.children=c.children.slice(0,mid+1);}
+    parent.keys.splice(i,0,promote);
+    parent.children.splice(i+1,0,r);
+    this.steps.push({action:`Split node and promote ${promote}`,reason:`Node overflow in B-Tree order ${this.order}, split around median key.`});
+  }
+  _insertNonFull(node,val){
+    if(node.isLeaf){
+      let i=0;while(i<node.keys.length&&node.keys[i]<val)i++;
+      if(node.keys[i]===val){this.steps.push({action:`Duplicate ${val}`,reason:'Key already exists.'});return;}
+      node.keys.splice(i,0,val);
+      this.steps.push({action:`Insert ${val} into leaf node`,reason:'Inserted key in sorted order within leaf.'});
+      return;
+    }
+    let i=0;while(i<node.keys.length&&val>node.keys[i])i++;
+    this.steps.push({action:`Descend to child[${i}]`,reason:`Choose child interval for ${val} based on separator keys.`});
+    if(node.children[i].keys.length>=this.order-1){
+      this._splitChild(node,i);
+      if(val>node.keys[i])i++;
+    }
+    this._insertNonFull(node.children[i],val);
+  }
+  insert(val){
+    this.steps=[];
+    this.steps.push({action:`B-Tree Insert ${val}`,reason:`Order ${this.order} B-Tree with max ${this.order-1} keys per node.`});
+    if(!this.root){this.root=this._newNode(true);this.root.keys=[val];this.steps.push({action:'Create root leaf',reason:'Tree was empty, created root with first key.'});return;}
+    if(this.root.keys.length>=this.order-1){
+      const nr=this._newNode(false);nr.children=[this.root];
+      this.root=nr;this._splitChild(nr,0);
+    }
+    this._insertNonFull(this.root,val);
+  }
+  search(val){
+    this.steps=[];
+    this.steps.push({action:`B-Tree Search ${val}`,reason:'Traverse internal nodes by key ranges until leaf.'});
+    let n=this.root;
+    while(n){
+      let i=0;while(i<n.keys.length&&val>n.keys[i])i++;
+      this.steps.push({action:`Visit node with ${n.keys.length} keys`,reason:`Compare against separators and choose position ${i}.`});
+      if(i<n.keys.length&&n.keys[i]===val){this.steps.push({action:`Found ${val}`,reason:'Key exists in current node.'});return;}
+      if(n.isLeaf)break;
+      n=n.children[i];
+    }
+    this.steps.push({action:`${val} NOT FOUND`,reason:'Reached leaf without finding the key.'});
+  }
+  delete(val){
+    this.steps=[];
+    this.steps.push({action:`B-Tree Delete ${val}`,reason:'Simplified delete: remove from leaf when present.'});
+    let n=this.root;
+    while(n){
+      let i=0;while(i<n.keys.length&&val>n.keys[i])i++;
+      if(i<n.keys.length&&n.keys[i]===val){
+        if(!n.isLeaf){this.steps.push({action:'Delete not applied',reason:'Full internal-node rebalance is not implemented in this visual mode.'});return;}
+        n.keys.splice(i,1);this.steps.push({action:'Removed key from leaf',reason:'Leaf key removed without rebalancing.'});return;
+      }
+      if(n.isLeaf)break;
+      this.steps.push({action:`Descend to child[${i}]`,reason:`Continue delete search path for ${val}.`});
+      n=n.children[i];
+    }
+    this.steps.push({action:`${val} NOT FOUND`,reason:'Key does not exist in this B-Tree.'});
+  }
+  toArray(){
+    const arr=[];if(!this.root)return arr;
+    const levels=[];const q=[{node:this.root,level:0}];
+    while(q.length){const {node,level}=q.shift();if(!levels[level])levels[level]=[];levels[level].push(node);if(!node.isLeaf)node.children.forEach(c=>q.push({node:c,level:level+1}));}
+    let y=40;
+    levels.forEach(level=>{const spacing=Math.max(120,520/level.length);level.forEach((n,i)=>{const x=(i-(level.length-1)/2)*spacing;if(!n.isLeaf){const nc=n.children.length;n.children.forEach((_,ci)=>{const cx=(ci-(nc)/2+0.5)*spacing+x;arr.push({type:'edge',x1:x,y1:y,x2:cx,y2:y+90});});}arr.push({id:n.id,val:n.keys.join('|'),x,y,color:n.isLeaf?'leaf':'internal',multi:true});});y+=90;});
+    return arr;
+  }
+}
+
+class SplayTree_JS {
+  constructor(){this.root=null;this.steps=[];}
+  _newNode(val){return{val,left:null,right:null,color:'splay',id:'sp'+Date.now()+Math.random().toString(16).slice(2)};}
+  _rotR(x){const y=x.left;x.left=y.right;y.right=x;return y;}
+  _rotL(x){const y=x.right;x.right=y.left;y.left=x;return y;}
+  _splay(root,key){
+    if(!root||root.val===key)return root;
+    if(key<root.val){
+      if(!root.left)return root;
+      this.steps.push({action:`Splay left from ${root.val}`,reason:`${key} < ${root.val}, move toward left subtree.`});
+      if(key<root.left.val){this.steps.push({action:'Zig-Zig step',reason:'Two left moves, rotate right twice.'});root.left.left=this._splay(root.left.left,key);root=this._rotR(root);} 
+      else if(key>root.left.val){this.steps.push({action:'Zig-Zag step',reason:'Left then right, rotate inside subtree first.'});root.left.right=this._splay(root.left.right,key);if(root.left.right)root.left=this._rotL(root.left);} 
+      return root.left?this._rotR(root):root;
+    }
+    if(!root.right)return root;
+    this.steps.push({action:`Splay right from ${root.val}`,reason:`${key} > ${root.val}, move toward right subtree.`});
+    if(key>root.right.val){this.steps.push({action:'Zig-Zig step',reason:'Two right moves, rotate left twice.'});root.right.right=this._splay(root.right.right,key);root=this._rotL(root);} 
+    else if(key<root.right.val){this.steps.push({action:'Zig-Zag step',reason:'Right then left, rotate inside subtree first.'});root.right.left=this._splay(root.right.left,key);if(root.right.left)root.right=this._rotR(root.right);} 
+    return root.right?this._rotL(root):root;
+  }
+  insert(val){
+    this.steps=[];this.steps.push({action:`Splay Insert ${val}`,reason:'Insert then splay key to root for fast repeated access.'});
+    if(!this.root){this.root=this._newNode(val);this.steps.push({action:'Create root node',reason:'Tree was empty.'});return;}
+    this.root=this._splay(this.root,val);
+    if(this.root.val===val){this.steps.push({action:'Duplicate key',reason:'Key already exists, only splay performed.'});return;}
+    const n=this._newNode(val);
+    if(val<this.root.val){n.right=this.root;n.left=this.root.left;this.root.left=null;this.steps.push({action:'Attach new root',reason:'New key becomes root with previous root on right.'});}
+    else{n.left=this.root;n.right=this.root.right;this.root.right=null;this.steps.push({action:'Attach new root',reason:'New key becomes root with previous root on left.'});}
+    this.root=n;this.steps.push({action:'Splay complete',reason:`Inserted ${val} and moved it to root.`});
+  }
+  search(val){
+    this.steps=[];this.steps.push({action:`Splay Search ${val}`,reason:'Search path is splayed so accessed key moves near root.'});
+    if(!this.root){this.steps.push({action:'Empty tree',reason:'No nodes available.'});return;}
+    this.root=this._splay(this.root,val);
+    if(this.root&&this.root.val===val)this.steps.push({action:`Found ${val}`,reason:'Target key is now at root.'});
+    else this.steps.push({action:`${val} NOT FOUND`,reason:'Closest accessed node has been splayed to root.'});
+  }
+  delete(val){
+    this.steps=[];this.steps.push({action:`Splay Delete ${val}`,reason:'Splay key to root, then remove and join subtrees.'});
+    if(!this.root){this.steps.push({action:'Empty tree',reason:'Nothing to delete.'});return;}
+    this.root=this._splay(this.root,val);
+    if(!this.root||this.root.val!==val){this.steps.push({action:'Delete skipped',reason:'Key does not exist after splay.'});return;}
+    if(!this.root.left){this.root=this.root.right;this.steps.push({action:'Remove root',reason:'Left subtree empty, promote right subtree.'});return;}
+    const rightSub=this.root.right;
+    this.root=this._splay(this.root.left,val);
+    this.root.right=rightSub;
+    this.steps.push({action:'Join subtrees',reason:'Splayed max of left subtree and attached right subtree.'});
+  }
+  toArray(){const arr=[];const dfs=(n,x,y,xOff)=>{if(!n)return;arr.push({id:n.id,val:n.val,x,y,color:'splay'});if(n.left)arr.push({type:'edge',x1:x,y1:y,x2:x-xOff,y2:y+80});if(n.right)arr.push({type:'edge',x1:x,y1:y,x2:x+xOff,y2:y+80});dfs(n.left,x-xOff,y+80,xOff/1.7);dfs(n.right,x+xOff,y+80,xOff/1.7);};dfs(this.root,0,40,110);return arr;}
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION 3 — WASM BRIDGE
+   Wraps Emscripten-compiled C module.
+   Falls back to JS silently if treemind.js is not present.
+   ═══════════════════════════════════════════════════════════ */
+
+/*
+ * TreeMindWASM exposes the same interface as the JS classes:
+ *   .insert(val) .search(val) .delete(val) .steps  .toArray()
+ *
+ * Internally it calls the C functions through cwrap() and reads
+ * back the JSON string that C wrote to its static buffer.
+ */
+class TreeMindWASM {
+  constructor(mod, kind) {
+    this._mod = mod;
+    this._kind = kind;   // 0=BST, 1=RBT, 2=B+, 3=B-Tree, 4=Splay
+    this.steps = [];
+    this._nodes = [];
+
+    /* cwrap all the C functions we need */
+    this._switch   = mod.cwrap('tm_switch_tree', null, ['number']);
+    this._clear    = mod.cwrap('tm_clear',        null, []);
+    this._getJson  = mod.cwrap('tm_get_json',     'string', []);
+
+    const ops = {
+      0: ['tm_bst_insert','tm_bst_search','tm_bst_delete'],
+      1: ['tm_rbt_insert','tm_rbt_search','tm_rbt_delete'],
+      2: ['tm_bplus_insert','tm_bplus_search','tm_bplus_delete'],
+      3: ['tm_btree_insert','tm_btree_search','tm_btree_delete'],
+      4: ['tm_splay_insert','tm_splay_search','tm_splay_delete'],
+    }[kind];
+
+    this._insert = mod.cwrap(ops[0], null, ['number']);
+    this._search = mod.cwrap(ops[1], null, ['number']);
+    this._delete = mod.cwrap(ops[2], null, ['number']);
+  }
+
+  _syncFromC() {
+    try {
+      const raw = this._getJson();
+      const data = JSON.parse(raw);
+      this.steps  = data.steps  || [];
+      this._nodes = data.nodes  || [];
+    } catch(e) {
+      console.warn('[WASM] JSON parse error:', e);
+    }
+  }
+
+  insert(val) { this._insert(val);        this._syncFromC(); }
+  search(val) { this._search(val);        this._syncFromC(); }
+  delete(val) { this._delete(val);        this._syncFromC(); }
+
+  clear()     {
+    /* clear is global; re-switch to get our tree's empty state */
+    this._clear();
+    this._switch(this._kind);
+    this._syncFromC();
+  }
+
+  /* Returns the same array format the SVG renderer expects */
+  toArray()   { return this._nodes; }
+
+  /* Re-fetch tree state when switching tree type */
+  refresh()   { this._switch(this._kind); this._syncFromC(); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION 4 — BRIDGE SELECTOR
+   Attempts to load WASM, falls back to JS.
+   ═══════════════════════════════════════════════════════════ */
+
+let wasmReady = false;
+let wasmMod   = null;
+
+/* Shared JS fallback trees (always constructed immediately) */
+const jsTrees = {
+  bst:   new BST_JS(),
+  rbt:   new RBT_JS(),
+  bplus: new BPlusTree_JS(3),
+  btree: new BTree_JS(3),
+  splay: new SplayTree_JS()
+};
+
+/* Active tree reference — starts pointing at JS trees */
+let activeTrees = jsTrees;
+let treeType = 'bst';
+let currentTree = jsTrees.bst;
+
+/* WASM tree wrappers (populated after module load) */
+let wasmTrees = null;
+
+/*
+ * Attempt to load the Emscripten module.
+ * The compiled files (treemind.js + treemind.wasm) must be served
+ * from the same directory as this HTML.
+ */
+function tryLoadWASM() {
+  return new Promise((resolve) => {
+    const script = document.createElement('script');
+    script.src = 'treemind.js';
+    script.onload = () => {
+      if (typeof TreeMindModule !== 'function') { resolve(false); return; }
+      TreeMindModule().then(mod => {
+        try {
+          mod.ccall('tm_init', null, [], []);
+          wasmMod  = mod;
+          wasmTrees = {
+            bst:   new TreeMindWASM(mod, 0),
+            rbt:   new TreeMindWASM(mod, 1),
+            bplus: new TreeMindWASM(mod, 2),
+            btree: new TreeMindWASM(mod, 3),
+            splay: new TreeMindWASM(mod, 4),
+          };
+          /* sync initial state from C */
+          Object.values(wasmTrees).forEach(t => t.refresh());
+          wasmReady = true;
+          resolve(true);
+        } catch(e) {
+          console.warn('[WASM] init failed:', e);
+          resolve(false);
+        }
+      }).catch(() => resolve(false));
+    };
+    script.onerror = () => resolve(false);
+    document.head.appendChild(script);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION 5 — VISUALIZER STATE & UI (unchanged logic)
+   ═══════════════════════════════════════════════════════════ */
+
+let autoPlay = false;
+let autoVals = [15,25,40,10,50,30,70,5,20];
+let autoIdx  = 0;
+
+const algoInfo = {
+  bst:   `<strong>Binary Search Tree</strong> — Every left child &lt; parent &lt; right child. Insert: O(log n) avg, O(n) worst. Delete: replace with in-order successor. Search: traverse based on comparison.`,
+  rbt:   `<strong>Red-Black Tree</strong> — Self-balancing BST with color properties. Guarantees O(log n) worst-case. Rules: Root BLACK, RED nodes have BLACK children, equal BLACK-height all paths.`,
+  bplus: `<strong>B+ Tree (order 3)</strong> — Multi-level tree optimized for disk access. All data in leaves linked together. Internal nodes are indexes. Split when node overflows (&ge; order keys).`,
+  btree: `<strong>B-Tree (order 3)</strong> — Balanced multi-way search tree. Keys are stored in all nodes. Insertions split full nodes and promote the median key upward.`,
+  splay: `<strong>Splay Tree</strong> — Self-adjusting BST. Every access performs zig / zig-zig / zig-zag rotations to move recently accessed keys closer to the root.`
+};
+
+const treeLabel = {
+  bst: 'BINARY SEARCH TREE',
+  rbt: 'RED-BLACK TREE',
+  bplus: 'B+ TREE',
+  btree: 'B-TREE',
+  splay: 'SPLAY TREE'
+};
+
+const complexityLabel = {
+  bst: 'O(log n) avg',
+  rbt: 'O(log n) guaranteed',
+  bplus: 'O(log n) guaranteed',
+  btree: 'O(log n) guaranteed',
+  splay: 'Amortized O(log n)'
+};
+
+function setTreeType(t) {
+  treeType = t;
+  currentTree = activeTrees[t];
+  /* If WASM — tell the C side which tree is active */
+  if (wasmReady) currentTree.refresh();
+  document.getElementById('tree-type-select').value = t;
+  document.getElementById('algo-info').innerHTML = algoInfo[t];
+  document.getElementById('canvas-label').textContent = t.toUpperCase()+' VISUALIZER';
+  document.getElementById('canvas-type').textContent  = treeLabel[t] || 'TREE';
+  document.getElementById('complexity-label').textContent = complexityLabel[t] || 'O(log n)';
+  renderTree(); updateSteps([]);
+}
+
+function onTreeTypeChange(v) { setTreeType(v); }
+
+function setMode(m,btn) {
+  document.querySelectorAll('.mode-select').forEach(b=>{b.textContent='Select Mode';b.classList.remove('active');});
+  btn.textContent='Active Mode'; btn.classList.add('active');
+}
+
+function getVal() { return parseInt(document.getElementById('val-input').value)||Math.floor(Math.random()*80)+10; }
+
+function doInsert() {
+  const v=getVal();
+  currentTree.insert(v);
+  renderTree(); updateSteps(currentTree.steps);
+  document.getElementById('val-input').value='';
+}
+
+function doDelete() {
+  const v=getVal();
+  currentTree.delete(v);
+  renderTree(); updateSteps(currentTree.steps);
+  document.getElementById('val-input').value='';
+}
+
+function doSearch() {
+  const v=getVal();
+  currentTree.search(v);
+  updateSteps(currentTree.steps);
+  renderTree();
+  document.getElementById('val-input').value='';
+}
+
+function doClear() {
+  if (wasmReady) {
+    /* WASM clear resets all three C trees */
+    wasmMod.ccall('tm_clear', null, [], []);
+    Object.values(wasmTrees).forEach(t => t.refresh());
+  } else {
+    activeTrees.bst   = new BST_JS();
+    activeTrees.rbt   = new RBT_JS();
+    activeTrees.bplus = new BPlusTree_JS(3);
+    activeTrees.btree = new BTree_JS(3);
+    activeTrees.splay = new SplayTree_JS();
+  }
+  currentTree = activeTrees[treeType];
+  renderTree(); updateSteps([]);
+}
+
+function togglePlay() {
+  autoPlay = !autoPlay;
+  const btn = document.getElementById('play-btn');
+  btn.textContent = autoPlay ? '⏸ Pause' : '▶ Auto';
+  if (autoPlay) autoInsert();
+}
+
+function autoInsert() {
+  if (!autoPlay) return;
+  const v = autoVals[autoIdx % autoVals.length];
+  autoIdx++;
+  currentTree.insert(v);
+  renderTree(); updateSteps(currentTree.steps);
+  const speed = parseInt(document.getElementById('speed-slider').value);
+  const delay = [1200,900,600,400,200][speed-1];
+  setTimeout(autoInsert, delay);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION 6 — SVG RENDERER  (unchanged from original)
+   ═══════════════════════════════════════════════════════════ */
+function renderTree() {
+  const svg = document.getElementById('tree-svg');
+  const W = svg.parentElement.offsetWidth || 600;
+  const H = 480;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = '';
+  const items = currentTree.toArray();
+
+  if (!items || items.length === 0) {
+    const g = document.createElementNS('http://www.w3.org/2000/svg','text');
+    g.setAttribute('x', W/2); g.setAttribute('y', H/2);
+    g.setAttribute('text-anchor','middle'); g.setAttribute('fill','#444');
+    g.setAttribute('font-family','Rajdhani,sans-serif'); g.setAttribute('font-size','16');
+    g.textContent = 'Insert a value to begin visualization';
+    svg.appendChild(g); return;
+  }
+
+  const cx = W/2;
+  const edges = items.filter(i => i.type==='edge');
+  const nodes = items.filter(i => !i.type);
+
+  edges.forEach(e => {
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',cx+e.x1); line.setAttribute('y1',e.y1);
+    line.setAttribute('x2',cx+e.x2); line.setAttribute('y2',e.y2);
+    line.setAttribute('stroke','rgba(255,100,0,0.35)'); line.setAttribute('stroke-width','1.5');
+    svg.appendChild(line);
+  });
+
+  nodes.forEach(n => {
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.style.cursor = 'pointer';
+    const isMulti = n.multi;
+    const nx = cx+n.x, ny = n.y;
+
+    if (isMulti) {
+      const keys = String(n.val).split('|');
+      const kw=36, kh=30, total=keys.length*kw;
+      const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      rect.setAttribute('x',nx-total/2); rect.setAttribute('y',ny-kh/2);
+      rect.setAttribute('width',total); rect.setAttribute('height',kh);
+      rect.setAttribute('rx','6');
+      rect.setAttribute('fill',n.color==='leaf'?'#1a1a1a':'#141414');
+      rect.setAttribute('stroke',n.color==='leaf'?'#FF6B00':'#FF2020');
+      rect.setAttribute('stroke-width','1.5');
+      g.appendChild(rect);
+      keys.forEach((k,i) => {
+        if(i>0){const sep=document.createElementNS('http://www.w3.org/2000/svg','line');sep.setAttribute('x1',nx-total/2+i*kw);sep.setAttribute('y1',ny-kh/2);sep.setAttribute('x2',nx-total/2+i*kw);sep.setAttribute('y2',ny+kh/2);sep.setAttribute('stroke','rgba(255,107,0,0.3)');sep.setAttribute('stroke-width','1');g.appendChild(sep);}
+        const t2=document.createElementNS('http://www.w3.org/2000/svg','text');
+        t2.setAttribute('x',nx-total/2+i*kw+kw/2); t2.setAttribute('y',ny+5);
+        t2.setAttribute('text-anchor','middle'); t2.setAttribute('fill','#EEE');
+        t2.setAttribute('font-family','Space Mono,monospace'); t2.setAttribute('font-size','11'); t2.setAttribute('font-weight','700');
+        t2.textContent=k; g.appendChild(t2);
+      });
+    } else {
+      const r=22;
+      const glow=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      glow.setAttribute('cx',nx); glow.setAttribute('cy',ny); glow.setAttribute('r',r+8);
+      const gc=n.color==='red'?'255,32,32':n.color==='black'?'60,60,60':'255,107,0';
+      glow.setAttribute('fill',`rgba(${gc},0.15)`); g.appendChild(glow);
+      const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      circle.setAttribute('cx',nx); circle.setAttribute('cy',ny); circle.setAttribute('r',r);
+      circle.setAttribute('fill',n.color==='red'?'#3D0000':n.color==='black'?'#111':'#1a0800');
+      circle.setAttribute('stroke',n.color==='red'?'#FF2020':n.color==='black'?'#555':'#FF6B00');
+      circle.setAttribute('stroke-width','2'); g.appendChild(circle);
+      const text=document.createElementNS('http://www.w3.org/2000/svg','text');
+      text.setAttribute('x',nx); text.setAttribute('y',ny+5);
+      text.setAttribute('text-anchor','middle');
+      text.setAttribute('fill',n.color==='black'?'#888':'#FFF');
+      text.setAttribute('font-family','Space Mono,monospace');
+      text.setAttribute('font-size','12'); text.setAttribute('font-weight','700');
+      text.textContent = n.val; g.appendChild(text);
+      const tip=document.getElementById('tooltip');
+      g.addEventListener('mouseenter',()=>{
+        tip.textContent=`val: ${n.val}${n.color&&n.color!=='node'?' | color: '+n.color.toUpperCase():''}`;
+        tip.style.opacity='1';
+      });
+      g.addEventListener('mousemove',e=>{
+        const rect=svg.parentElement.getBoundingClientRect();
+        tip.style.left=(e.clientX-rect.left+12)+'px';
+        tip.style.top=(e.clientY-rect.top-30)+'px';
+      });
+      g.addEventListener('mouseleave',()=>tip.style.opacity='0');
+    }
+    svg.appendChild(g);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION 7 — STEP LOG RENDERER  (unchanged from original)
+   ═══════════════════════════════════════════════════════════ */
+function updateSteps(steps) {
+  const log = document.getElementById('step-log');
+  const cnt = document.getElementById('step-count');
+  const fill = document.getElementById('progress-fill');
+  if (!steps || !steps.length) {
+    log.innerHTML='<div class="step-empty"><div class="step-empty-icon">🌳</div><div>Insert nodes to see<br>step-by-step explanations</div></div>';
+    cnt.textContent='0 steps'; fill.style.width='0%'; return;
+  }
+  cnt.textContent = steps.length+' step'+(steps.length>1?'s':'');
+  fill.style.width = '100%';
+  log.innerHTML = '';
+  steps.forEach((s,i) => {
+    const el = document.createElement('div');
+    el.className = 'step-item '+(i===steps.length-1?'active':'done');
+    el.innerHTML = `<div class="step-num">STEP ${i+1}</div><div class="step-action">${s.action}</div><div class="step-reason">${s.reason}</div>`;
+    el.style.animationDelay = (i*0.05)+'s';
+    log.appendChild(el);
+  });
+  log.scrollTop = log.scrollHeight;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION 8 — INITIALISATION
+   ═══════════════════════════════════════════════════════════ */
+window.addEventListener('load', async () => {
+  /* Dismiss loader after 2s (same as original) */
+  setTimeout(() => document.getElementById('loader').classList.add('hide'), 2000);
+
+  /* Pre-seed JS fallback trees (immediate, like original) */
+  [50,30,70,20,40,60,80].forEach(v => jsTrees.bst.insert(v));
+  [50,30,70,20,40,60,80].forEach(v => jsTrees.rbt.insert(v));
+  [20,40,60,10,30,50,70].forEach(v => jsTrees.bplus.insert(v));
+  [40,20,60,10,30,50,70].forEach(v => jsTrees.btree.insert(v));
+  [50,30,70,20,40,60,80].forEach(v => jsTrees.splay.insert(v));
+  currentTree = jsTrees.bst;
+  activeTrees = jsTrees;
+  renderTree(); updateSteps([]);
+
+  /* Attempt WASM load in background */
+  const ok = await tryLoadWASM();
+  const badge = document.getElementById('wasm-badge');
+  if (ok) {
+    /* Switch live to WASM trees */
+    activeTrees = wasmTrees;
+    currentTree = wasmTrees[treeType];
+    badge.className = 'wasm';
+    badge.textContent = '⬡ C/WASM';
+    renderTree(); updateSteps([]);
+    console.info('[TreeMind] Running on C/WebAssembly backend ✓');
+  } else {
+    badge.className = 'js';
+    badge.textContent = '⬡ JS MODE';
+    console.info('[TreeMind] treemind.wasm not found — running pure-JS fallback');
+  }
+
+  window.addEventListener('resize', () => renderTree());
+});
+</script>
+</body>
+</html>
